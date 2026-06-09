@@ -154,7 +154,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/v1/pages/samsung/posts/1/comments?page=1&size=10",
+					"raw": "{{base_url}}/api/v1/pages/samsung/posts/121/comments?page=1&size=10",
 					"host": [
 						"{{base_url}}"
 					],

@@ -1,3 +1,5 @@
+I have added postmanCollection.json in docs folder. It was not getting uploaded in form due to server issues. 
+
 # LinkedIn Insights Microservice
 
 A backend microservice built with **FastAPI**, **SQLAlchemy 2.0**, and **MySQL**. It scrapes LinkedIn company details, posts, comments, and employees in real-time, caches data into a structured relational database, and exposes clean RESTful APIs with advanced filtering and pagination.
