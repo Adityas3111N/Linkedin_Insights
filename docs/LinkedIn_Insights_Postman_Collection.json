@@ -1,0 +1,225 @@
+{
+	"info": {
+		"_postman_id": "7fae02c1-2287-43eb-8e5f-56b3e7cdbb0f",
+		"name": "LinkedIn Insights API",
+		"description": "Postman collection for testing the LinkedIn Insights microservice API endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "System Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Checks database connectivity and server status."
+			},
+			"response": []
+		},
+		{
+			"name": "List Pages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/pages?page=1&size=10&industry=Technology",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"pages"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "industry",
+							"value": "Technology"
+						},
+						{
+							"key": "min_followers",
+							"value": "1000",
+							"disabled": true
+						},
+						{
+							"key": "max_followers",
+							"value": "100000",
+							"disabled": true
+						},
+						{
+							"key": "name",
+							"value": "samsung",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve stored pages with filters and pagination."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Page Details (Cached/Scraped)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/pages/samsung",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"pages",
+						"samsung"
+					]
+				},
+				"description": "Fetch details of a single page. Automatically scrapes LinkedIn if not in database."
+			},
+			"response": []
+		},
+		{
+			"name": "Force Scrape Page",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/pages/samsung/scrape",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"pages",
+						"samsung",
+						"scrape"
+					]
+				},
+				"description": "Force trigger a real-time scraping run of LinkedIn and update the cached database details."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Page Posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/pages/samsung/posts?page=1&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"pages",
+						"samsung",
+						"posts"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				},
+				"description": "Get paginated posts for a specific LinkedIn page."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Post Comments",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/pages/samsung/posts/1/comments?page=1&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"pages",
+						"samsung",
+						"posts",
+						"1",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				},
+				"description": "Fetch paginated comments for a specific post. (Adjust post ID dynamically based on returned posts)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Page Employees",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/pages/samsung/employees?page=1&size=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"pages",
+						"samsung",
+						"employees"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				},
+				"description": "Get paginated employees working at the company."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}

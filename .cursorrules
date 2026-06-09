@@ -1,0 +1,104 @@
+# Cursor Rules - LinkedIn Insights Microservice
+
+This file defines the project overview, the current folder structure, and the architecture guidelines for any AI coding assistant working on this repository.
+
+---
+
+## 1. Project Overview & Tech Stack
+A high-performance backend microservice that scrapes LinkedIn company pages, saves structured relational data into a MySQL database, and exposes clean RESTful APIs with advanced filtering and pagination support.
+- **Framework**: FastAPI (Python 3.11+)
+- **Database**: MySQL 8.x + SQLAlchemy 2.0 ORM
+- **Validation**: Pydantic v2 (for request/response parsing)
+- **HTTP/Scraping**: `httpx` and `BeautifulSoup4`
+- **Testing**: `pytest` + `pytest-asyncio`
+
+---
+
+## 2. Folder Structure Map
+Below is the definitive folder structure for this microservice:
+
+```
+linkedin-insights/
+├── .cursorrules             # [THIS FILE] AI rules, folder structure, and guidelines
+├── CLAUDE.md                # System instructions (naming, architecture, imports)
+├── requirements.txt         # Project dependencies
+├── .env                     # Local environment variables (DO NOT COMMIT)
+├── .gitignore               # Ignored files (venv, pycache, .env)
+│
+├── docs/                    # Documentation & specifications
+│   ├── ARCHITECTURE.md      # Service Architecture & Dependency Injection pattern
+│   ├── DATABASE.md          # MySQL Schema design & ER diagram definitions
+│   ├── API_SPEC.md          # API Request/Response specifications
+│   └── CONTRIBUTING.md      # Code standards, Google-style docstrings, type-hint guidelines
+│
+├── app/                     # Main Application Source Code
+│   ├── __init__.py          # Marks app as package
+│   ├── main.py              # FastAPI app creation & startup lifecycle
+│   ├── config.py            # Environment configurations (Pydantic BaseSettings)
+│   ├── database.py          # SQLAlchemy engine, session maker & get_db dependency
+│   │
+│   ├── models/              # SQLAlchemy Database ORM Models
+│   │   ├── __init__.py      # Exports all models for easy imports
+│   │   ├── base.py          # Shared DeclarativeBase & TimestampMixin
+│   │   ├── page.py          # mapping to `pages` table
+│   │   ├── post.py          # mapping to `posts` table
+│   │   ├── comment.py       # mapping to `comments` table
+│   │   └── employee.py      # mapping to `employees` table
+│   │
+│   ├── schemas/             # Pydantic Schemas (Request/Response shapes)
+│   │   ├── __init__.py
+│   │   ├── common.py        # Generic PaginatedResponse schema
+│   │   ├── page.py          # Page input filters & output schemas
+│   │   ├── post.py          # Post response schemas
+│   │   ├── comment.py       # Comment response schemas
+│   │   └── employee.py      # Employee response schemas
+│   │
+│   ├── repositories/        # Database Access Layer (Encapsulated CRUD operations)
+│   │   ├── __init__.py
+│   │   ├── page_repository.py
+│   │   ├── post_repository.py
+│   │   ├── comment_repository.py
+│   │   └── employee_repository.py
+│   │
+│   ├── services/            # Business Logic Layer
+│   │   ├── __init__.py
+│   │   ├── page_service.py      # Orchestrates scraper, repositories, and logic
+│   │   └── scraper_service.py   # Handles web scraping / data fetching logic
+│   │
+│   ├── routers/             # Web API Router Handlers (HTTP/REST endpoints)
+│   │   ├── __init__.py
+│   │   ├── page_router.py       # Endpoints under /api/v1/pages
+│   │   └── health_router.py     # Endpoint under /health
+│   │
+│   └── utils/               # Common Helper Utilities
+│       ├── __init__.py
+│       ├── exceptions.py        # Custom domain exceptions
+│       └── pagination.py        # Pagination standard formatter
+│
+└── tests/                   # Test Suite
+    ├── __init__.py
+    ├── conftest.py          # Pytest fixtures (SQLite in-memory DB, API client)
+    ├── test_page_repository.py
+    ├── test_page_service.py
+    └── test_page_router.py
+```
+
+---
+
+## 3. Architecture & Twelve-Factor App Principles
+1. **Factor 3 (Config)**: Database connections and external secrets are loaded strictly from the environment (`.env`). The codebase remains environment-agnostic. 
+2. **Database Agnosticism**: All database operations are decoupled using SQLAlchemy 2.0 ORM. Switching from a local MySQL instance to a cloud MySQL provider (such as Aiven, Railway, AWS RDS, GCP Cloud SQL) only requires changing the `DATABASE_URL` environment variable.
+3. **Strict Layer Boundaries**: 
+   - Routers only handle HTTP requests/responses, request validation, and status codes.
+   - Services only handle business rules, orchestration, calling scrapers, and raising custom Domain Exceptions.
+   - Repositories only run database queries using SQLAlchemy. They accept a `Session` object.
+4. **DRY SQLAlchemy Models**: Models inherit from a common DeclarativeBase and use shared Mixins for `id`, `created_at`, and `updated_at` timestamps to avoid code duplication.
+5. **Validation & ORM Mapping**: Convert SQLAlchemy models into Pydantic models automatically using Pydantic's `model_config = ConfigDict(from_attributes=True)`.
+
+---
+
+## 4. AI Working Agreement
+- Always inspect this file and the documents under `docs/` before proposing code changes.
+- Ensure all public functions are typed (`def fn(param: Type) -> ReturnType:`) and contain detailed Google-style docstrings.
+- Never write placeholder code or omit sections (e.g., `# TODO: implement this`). Write production-ready, clean, scalable logic.
+- Maintain existing codebase comments and formatting rules.
