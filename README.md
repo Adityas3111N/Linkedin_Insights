@@ -153,14 +153,15 @@ I chose the cascade approach. If LinkedIn credentials are in `.env`, it queries 
 
 ---
 
-## Core Interview Talking Points
+## Architecture & Performance Decisions
 
-1. **Pragmatic Layered Architecture**
-   - We decoupled SQL transactions from business logic. If we migrate from MySQL to PostgreSQL or SQLite, we only swap or update the Repository layer. The Service layer, routers, and application logic remain completely untouched.
+1. **Layered Decoupling**
+   - Database transactions are separated from business logic. If we migrate from MySQL to PostgreSQL or SQLite, only the Repository layer changes. The Service layer, routers, and application logic remain completely untouched.
 
 2. **In-Memory & DB Caching**
-   - Scraping is I/O heavy and slow. We use two layers of caching: 1) local database storage, and 2) a short-lived (5-minute TTL) in-memory cache at the router layer. This keeps response times sub-millisecond for popular pages and limits unnecessary network requests.
+   - Scraping is I/O heavy. We use local database storage combined with a short-lived (5-minute TTL) in-memory cache at the router layer to keep response times sub-millisecond for popular requests and protect against redundant network calls.
 
 3. **Connection Management**
-   - I used FastAPI's dependency injection (`Depends(get_db)`) to inject SQLAlchemy sessions. It's written as a Python generator (`yield`), which guarantees that SQLAlchemy sessions are cleanly closed (`db.close()`) after a request finishes, even if the API route raises an unhandled exception.
+   - FastAPI's dependency injection (`Depends(get_db)`) manages database sessions as a generator (`yield`). This guarantees that SQLAlchemy sessions are cleanly closed (`db.close()`) after a request finishes, preventing connection leaks.
+
 
