@@ -63,7 +63,7 @@ linkedin-insights/
 ### 2. Installation
 Clone this repository and open the directory:
 ```bash
-git clone <your-repository-url>
+git clone <https://github.com/Adityas3111N/Linkedin_Insights.git>
 cd Linkedin-insights
 ```
 
@@ -136,16 +136,27 @@ pytest -v
 
 ---
 
+## Design Journey: Handling the LinkedIn Auth Wall
+
+Initially, I tried scraping public LinkedIn pages directly using `httpx` and `BeautifulSoup4`. However, LinkedIn aggressively redirects unauthenticated traffic to an auth wall after a few requests, rendering raw HTML scraping useless in production.
+
+I evaluated three options to handle this:
+1. **Headless Browsers (Playwright/Selenium)**: Slow, heavy, and overkill for a simple microservice.
+2. **Paid API Proxies**: Reliable, but introduces external costs and API key management.
+3. **Lightweight Authenticated Wrapper + Cascade Fallback**: What I implemented.
+
+I chose the cascade approach. If LinkedIn credentials are in `.env`, it queries LinkedIn's internal Voyager API wrapper for real-time posts, comments, and employees. If credentials are missing, it falls back to a public HTML parse attempt, followed by pre-defined seed data, and finally structured placeholder generation. This ensures the app is highly resilient and always displays structured data to the user without crashing.
+
+---
+
 ## Core Interview Talking Points
 
 1. **Pragmatic Layered Architecture**
    - We decoupled SQL transactions from business logic. If we migrate from MySQL to PostgreSQL or SQLite, we only swap or update the Repository layer. The Service layer, routers, and application logic remain completely untouched.
 
-2. **Scraper Resilience & Fallbacks**
-   - Scraping public sites is fragile. I engineered a multi-layered fallback strategy: authenticated client -> public HTML parser -> local seed data -> structured generator. This ensures that the frontend and APIs remain functional even if LinkedIn rate-limits or blocks requests.
-
-3. **In-Memory & DB Caching**
+2. **In-Memory & DB Caching**
    - Scraping is I/O heavy and slow. We use two layers of caching: 1) local database storage, and 2) a short-lived (5-minute TTL) in-memory cache at the router layer. This keeps response times sub-millisecond for popular pages and limits unnecessary network requests.
 
-4. **Connection Management**
+3. **Connection Management**
    - I used FastAPI's dependency injection (`Depends(get_db)`) to inject SQLAlchemy sessions. It's written as a Python generator (`yield`), which guarantees that SQLAlchemy sessions are cleanly closed (`db.close()`) after a request finishes, even if the API route raises an unhandled exception.
+
