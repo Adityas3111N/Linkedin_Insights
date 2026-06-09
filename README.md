@@ -6,6 +6,31 @@ A backend microservice built with **FastAPI**, **SQLAlchemy 2.0**, and **MySQL**
 
 Designed with a clean separation of concerns utilizing the **Repository Pattern** and a **Service Layer**, keeping the codebase highly maintainable, testable, and database-agnostic.
 
+### 🔗 Live Demo
+
+| | Link |
+|---|---|
+| 🌐 **Frontend** | [linkedin-insights-eosin.vercel.app](https://linkedin-insights-eosin.vercel.app) |
+| ⚡ **Backend API** | [linkedin-insights-acmu.onrender.com](https://linkedin-insights-acmu.onrender.com) |
+| 📖 **Swagger Docs** | [linkedin-insights-acmu.onrender.com/docs](https://linkedin-insights-acmu.onrender.com/docs) |
+| 🗄️ **Database** | Aiven Cloud MySQL 8.0 |
+
+> ⚠️ **Note**: The backend is deployed on **Render's free tier**. After periods of inactivity, the server spins down and the first request may take **up to 50 seconds** to cold-start. Subsequent requests are fast.
+
+---
+
+### Screenshots
+
+![Posts](docs/screenshots/Posts.png)
+
+![Top Posts](docs/screenshots/top-posts.png)
+
+![Comments](docs/screenshots/comments.png)
+
+![Employees](docs/screenshots/Employees.png)
+
+![Search History](docs/screenshots/history.png)
+
 ---
 
 ## Key Features
@@ -53,6 +78,52 @@ linkedin-insights/
 - **Pydantic v2** — Data parsing and verification.
 - **BeautifulSoup4** — Public HTML scraping.
 - **Pytest** — Automated testing.
+
+
+---
+
+## Docker Setup
+
+The backend is fully containerized using **Docker** and **Docker Compose**.
+
+### Running with Docker Compose (Recommended)
+This spins up both the FastAPI app and a local MySQL 8.0 database:
+```bash
+docker-compose up --build
+```
+- The `db` service starts a MySQL container with a health check.
+- The `web` service waits for MySQL to be healthy before starting (`depends_on: condition: service_healthy`).
+- Access the API at `http://localhost:8000`.
+
+### Running with Docker Only (BYO Database)
+If you have an external MySQL instance (e.g., Aiven, RDS):
+```bash
+docker build -t linkedin-insights .
+docker run -p 8000:8000 \
+  -e DATABASE_URL="mysql+pymysql://user:pass@host:port/dbname" \
+  -e APP_ENV=production \
+  linkedin-insights
+```
+
+### Dockerfile Highlights
+- **Base Image**: `python:3.11-slim` — minimal footprint.
+- **Build Dependencies**: Installs `build-essential` for compiling native extensions, then cleans up apt cache.
+- **Production Server**: Runs `uvicorn` directly (no Gunicorn wrapper needed for single-instance Render deployment).
+
+---
+
+## Deployment Challenges & Fixes
+
+Deploying to a cloud stack (Render + Aiven + Vercel) introduced real-world issues that don't surface in local development:
+
+### 1. MySQL SSL Authentication (`ssl-mode` parameter)
+Aiven provides a `DATABASE_URL` with `?ssl-mode=REQUIRED` appended. PyMySQL does **not** support `ssl-mode` as a URL query parameter — it causes a `TypeError` at connection time. The fix was to strip the query parameter from the URL and inject SSL configuration programmatically via SQLAlchemy's `connect_args` in `database.py`.
+
+### 2. Missing `cryptography` Package
+Aiven MySQL uses `caching_sha2_password` authentication. PyMySQL requires the `cryptography` package to handle this auth method, but it's not installed by default. Locally this didn't surface because local MySQL uses `mysql_native_password`. Added `cryptography` to `requirements.txt`.
+
+### 3. CORS for Cross-Origin Frontend
+The frontend (Vercel, `*.vercel.app`) and backend (Render, `*.onrender.com`) are on different origins. Without proper CORS middleware configuration, browsers block the API responses. Configured FastAPI's `CORSMiddleware` to allow the Vercel origin.
 
 ---
 
