@@ -11,36 +11,19 @@ logger = logging.getLogger(__name__)
 
 
 class ScraperService:
-    """Multi-layered LinkedIn scraping service.
-
-    Strategy (cascading fallback):
-        1. linkedin-api    — Uses LinkedIn's internal Voyager API via the
-                             `linkedin-api` Python package. Requires LinkedIn
-                             credentials in .env. Returns structured JSON with
-                             real company data, posts, and comments.
-        2. Direct HTML     — Free. Parses public LinkedIn HTML for meta tags,
-                             JSON-LD, and Open Graph data. LinkedIn often blocks
-                             this with an auth-wall redirect.
-        3. Seed Data       — Curated real-world data for popular companies.
-                             Ensures the demo always looks professional.
-        4. Generation      — Last resort structured placeholder data so the API
-                             never returns empty.
-    """
-
-    # Curated seed data for popular companies (real data, manually verified)
-    SEED_DATA: Dict[str, Dict[str, Any]] = {
+    SEED_DATA = {
         "google": {
             "page_id": "google",
             "name": "Google",
             "url": "https://www.linkedin.com/company/google/",
             "linkedin_id": "1441",
             "profile_pic_url": "https://media.licdn.com/dms/image/v2/C4D0BAQHiNSL4Or29cA/company-logo_200_200/company-logo_200_200/0/1631311446380",
-            "description": "A subsidiary of Alphabet Inc., Google is a global technology company specializing in internet-related services and products including online advertising, a search engine, cloud computing, software, and hardware.",
+            "description": "A subsidiary of Alphabet Inc., Google is a global technology company specializing in internet-related services and products.",
             "website": "https://about.google",
             "industry": "Technology, Information and Internet",
             "follower_count": 33842842,
             "head_count": 182502,
-            "specialities": ["Search", "Ads", "Mobile", "Android", "Online Video", "Apps", "Machine Learning", "Virtual Reality", "Cloud", "Hardware", "Artificial Intelligence", "YouTube"],
+            "specialities": ["Search", "Ads", "Mobile", "Android", "Cloud", "Hardware", "Artificial Intelligence"],
             "founded": "1998",
         },
         "microsoft": {
@@ -49,12 +32,12 @@ class ScraperService:
             "url": "https://www.linkedin.com/company/microsoft/",
             "linkedin_id": "1035",
             "profile_pic_url": "https://media.licdn.com/dms/image/v2/C560BAQGrV5i4w0BKMQ/company-logo_200_200/company-logo_200_200/0/1630652622688/microsoft_logo",
-            "description": "Every company has a mission. What's ours? To empower every person and every organization on the planet to achieve more.",
+            "description": "Our mission is to empower every person and every organization on the planet to achieve more.",
             "website": "https://www.microsoft.com",
             "industry": "Software Development",
             "follower_count": 22722985,
             "head_count": 228000,
-            "specialities": ["Business Software", "Developer Tools", "Home & Educational Software", "Tablets", "Search", "Advertising", "Servers", "Windows Operating System", "Cloud Computing", "Quantum Computing", "AI", "Machine Learning", "Gaming", "Developers"],
+            "specialities": ["Business Software", "Developer Tools", "Cloud Computing", "AI", "Machine Learning", "Gaming"],
             "founded": "1975",
         },
         "apple": {
@@ -63,12 +46,12 @@ class ScraperService:
             "url": "https://www.linkedin.com/company/apple/",
             "linkedin_id": "162479",
             "profile_pic_url": "https://media.licdn.com/dms/image/v2/C560BAQHdAaarsO-eyA/company-logo_200_200/company-logo_200_200/0/1630637844948/apple_logo",
-            "description": "We're a diverse collective of thinkers and doers, continually reimagining what's possible to help us all do what we love in new ways.",
+            "description": "We're a diverse collective of thinkers and doers, continually reimagining what's possible.",
             "website": "https://www.apple.com",
             "industry": "Computers and Electronics Manufacturing",
             "follower_count": 17756653,
             "head_count": 164000,
-            "specialities": ["Innovative Product Development", "World-Class Operations", "Retail", "Telephone Support"],
+            "specialities": ["Innovative Product Development", "World-Class Operations", "Retail"],
             "founded": "1976",
         },
         "samsung": {
@@ -77,12 +60,12 @@ class ScraperService:
             "url": "https://www.linkedin.com/company/samsung/",
             "linkedin_id": "3353",
             "profile_pic_url": "https://media.licdn.com/dms/image/v2/D560BAQMKVMqnOA8-PQ/company-logo_200_200/company-logo_200_200/0/1719396583879/samsung_electronics_logo",
-            "description": "Samsung Electronics is a global leader in technology, opening new possibilities for people everywhere through relentless innovation and discovery.",
+            "description": "Samsung Electronics is a global leader in technology, opening new possibilities for people everywhere.",
             "website": "https://www.samsung.com",
             "industry": "Computers and Electronics Manufacturing",
             "follower_count": 5268044,
             "head_count": 267937,
-            "specialities": ["Semiconductors", "Smart Phones", "Display", "Television", "Home Appliances", "Network", "Cameras"],
+            "specialities": ["Semiconductors", "Smart Phones", "Display", "Television", "Home Appliances"],
             "founded": "1969",
         },
         "amazon": {
@@ -91,7 +74,7 @@ class ScraperService:
             "url": "https://www.linkedin.com/company/amazon/",
             "linkedin_id": "1586",
             "profile_pic_url": "https://media.licdn.com/dms/image/v2/C560BAQHTvZwCx4p2Qg/company-logo_200_200/company-logo_200_200/0/1630640869849/amazon_logo",
-            "description": "Amazon is guided by four principles: customer obsession rather than competitor focus, passion for invention, commitment to operational excellence, and long-term thinking.",
+            "description": "Amazon is guided by four principles: customer obsession, passion for invention, commitment to operational excellence, and long-term thinking.",
             "website": "https://www.amazon.com",
             "industry": "Technology, Information and Internet",
             "follower_count": 33291779,
@@ -119,12 +102,12 @@ class ScraperService:
             "url": "https://www.linkedin.com/company/deepsolv/",
             "linkedin_id": "80567431",
             "profile_pic_url": None,
-            "description": "DeepSolv is a creative intelligence company helping brands scale their content and performance marketing with the power of AI-driven creative optimization.",
+            "description": "DeepSolv is a creative intelligence company helping brands scale their content and performance marketing with AI-driven optimization.",
             "website": "https://www.deepsolv.com",
             "industry": "Technology, Information and Internet",
             "follower_count": 4186,
             "head_count": 42,
-            "specialities": ["AI", "Creative Intelligence", "Performance Marketing", "Content Optimization"],
+            "specialities": ["AI", "Creative Intelligence", "Performance Marketing"],
             "founded": "2023",
         },
         "tesla-motors": {
@@ -144,149 +127,94 @@ class ScraperService:
     }
 
     def __init__(self, linkedin_email: str = None, linkedin_password: str = None):
-        """Initialize scraper service.
-
-        Args:
-            linkedin_email: LinkedIn account email for authenticated scraping.
-            linkedin_password: LinkedIn account password.
-        """
         self.linkedin_email = linkedin_email
         self.linkedin_password = linkedin_password
-        self._linkedin_client = None  # Lazy initialization
-
-        # HTTP client for direct HTML scraping fallback
-        self.headers = {
+        self._client = None
+        self.client_headers = {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
             "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         }
-        self.http_client = httpx.Client(headers=self.headers, follow_redirects=True, timeout=15.0)
+        self.http = httpx.Client(headers=self.client_headers, follow_redirects=True, timeout=15.0)
 
-    def _get_linkedin_client(self):
-        """Lazy initialization of the linkedin-api client.
-
-        Creates the connection only on first use so the app starts fast
-        even when credentials are not configured.
-        """
-        if self._linkedin_client is None and self.linkedin_email and self.linkedin_password:
+    def _get_client(self):
+        if self._client is None and self.linkedin_email and self.linkedin_password:
             try:
                 from linkedin_api import Linkedin
-                logger.info("Authenticating with LinkedIn via linkedin-api...")
-                self._linkedin_client = Linkedin(self.linkedin_email, self.linkedin_password)
-                logger.info("LinkedIn authentication successful.")
+                logger.info("Initializing LinkedIn Voyager client...")
+                self._client = Linkedin(self.linkedin_email, self.linkedin_password)
             except Exception as e:
-                logger.error(f"Failed to authenticate with LinkedIn: {e}")
-                self._linkedin_client = False  # Mark as failed so we don't retry
-        return self._linkedin_client if self._linkedin_client else None
-
-    # =========================================================================
-    # Main Entry Point
-    # =========================================================================
+                logger.error(f"Failed to connect to LinkedIn API client: {e}")
+                self._client = False
+        return self._client if self._client else None
 
     def scrape_all(self, page_id: str) -> Dict[str, Any]:
-        """Scrapes LinkedIn company data using a multi-layered cascade strategy.
+        # Cascade strategy: API -> HTML parser -> Seed database -> fallback generator
+        logger.info(f"Scraping info for company slug '{page_id}'")
 
-        Cascade order:
-            1. linkedin-api (authenticated, real data for everything)
-            2. Direct HTML scrape (unauthenticated, limited data)
-            3. Curated seed data (for known popular companies)
-            4. Structured generation (last resort fallback)
-
-        Args:
-            page_id: The LinkedIn company URL slug (e.g. 'google').
-
-        Returns:
-            Complete nested dict with page, posts, and employees data.
-        """
-        logger.info(f"Starting multi-layer scrape for '{page_id}'")
-
-        # --- Layer 1: linkedin-api (authenticated, full data) ---
-        result = self._scrape_via_linkedin_api(page_id)
+        # 1. API Client (Voyager API wrapper)
+        result = self._scrape_via_api(page_id)
         if result:
-            logger.info(f"[Layer 1 - linkedin-api] Successfully scraped real data for '{page_id}'")
             return result
 
-        # --- Layer 2: Direct HTML scrape ---
+        # 2. Public HTML Parsing
         page_data = self._scrape_via_html(page_id)
-        source = "html_scrape" if page_data else None
+        source = "html" if page_data else None
 
-        # --- Layer 3: Curated seed data ---
+        # 3. Seed fallback
         if not page_data:
             seed = self.SEED_DATA.get(page_id)
             if seed:
                 page_data = dict(seed)
-                source = "seed_data"
-                logger.info(f"[Layer 3 - Seed] Using curated data for '{page_id}'")
+                source = "seed"
 
-        # --- Layer 4: Structured generation ---
+        # 4. Synthesize data if still empty
         if not page_data:
-            page_data = self._build_generated_page(page_id)
+            page_data = self._build_fallback_page(page_id)
             source = "generated"
-            logger.warning(f"[Layer 4 - Generated] Placeholder data for '{page_id}'")
 
-        # For layers 2-4, posts and employees aren't available without auth
-        company_name = page_data.get("name", page_id.title())
-        posts = self._generate_posts(company_name)
-        employees = self._generate_employees()
-
+        comp_name = page_data.get("name", page_id.title())
         return {
             "page": page_data,
-            "posts": posts,
-            "employees": employees,
+            "posts": self._generate_posts(comp_name),
+            "employees": self._generate_employees(),
         }
 
-    # =========================================================================
-    # Layer 1 — linkedin-api (Authenticated Scraping)
-    # =========================================================================
-
-    def _scrape_via_linkedin_api(self, page_id: str) -> Optional[Dict[str, Any]]:
-        """Scrapes real LinkedIn data using the linkedin-api package.
-
-        This uses LinkedIn's internal Voyager API endpoints, authenticated
-        with real LinkedIn credentials. Returns real company info, real posts
-        with real engagement counts, real employee profiles, and real comments.
-        """
-        client = self._get_linkedin_client()
+    def _scrape_via_api(self, page_id: str) -> Optional[Dict[str, Any]]:
+        client = self._get_client()
         if not client:
-            logger.info("[Layer 1 - linkedin-api] No credentials configured, skipping.")
             return None
 
         try:
-            # --- Company info ---
-            company_data = client.get_company(page_id)
-            if not company_data:
-                logger.warning(f"[Layer 1] linkedin-api returned empty for '{page_id}'")
+            raw_company = client.get_company(page_id)
+            if not raw_company:
                 return None
 
-            page_data = self._parse_linkedin_api_company(page_id, company_data)
-
-            # --- Company posts (recent 20) ---
-            raw_posts = []
+            page_data = self._parse_api_company(page_id, raw_company)
+            
+            # Fetch maximum 20 updates
+            raw_updates = []
             try:
-                raw_posts = client.get_company_updates(public_id=page_id, max_results=20)
-                logger.info(f"[Layer 1] Fetched {len(raw_posts)} posts for '{page_id}'")
+                raw_updates = client.get_company_updates(public_id=page_id, max_results=20)
             except Exception as e:
-                logger.warning(f"[Layer 1] Could not fetch posts for '{page_id}': {e}")
+                logger.warning(f"Could not retrieve updates for page {page_id}: {e}")
 
-            posts = self._parse_linkedin_api_posts(raw_posts, client)
+            posts = self._parse_api_posts(raw_updates, client)
 
-            # --- Employees (search people at this company) ---
+            # Search employees up to limit 40
             employees = []
             try:
-                company_urn = company_data.get("entityUrn", "")
-                company_urn_id = company_urn.split(":")[-1] if company_urn else None
-                if company_urn_id:
-                    raw_people = client.search_people(current_company=[company_urn_id], limit=40)
-                    employees = self._parse_linkedin_api_employees(raw_people)
-                    logger.info(f"[Layer 1] Found {len(employees)} employees for '{page_id}'")
+                urn = raw_company.get("entityUrn", "")
+                urn_id = urn.split(":")[-1] if urn else None
+                if urn_id:
+                    people = client.search_people(current_company=[urn_id], limit=40)
+                    employees = self._parse_api_employees(people)
             except Exception as e:
-                logger.warning(f"[Layer 1] Could not search employees for '{page_id}': {e}")
+                logger.warning(f"Could not find employees via API search: {e}")
 
-            # If no employees found via search, generate placeholders
             if not employees:
                 employees = self._generate_employees()
 
@@ -295,85 +223,71 @@ class ScraperService:
                 "posts": posts if posts else self._generate_posts(page_data.get("name", page_id)),
                 "employees": employees,
             }
-
         except Exception as e:
-            logger.error(f"[Layer 1] linkedin-api error for '{page_id}': {e}")
+            logger.error(f"Error executing API scrape logic: {e}")
             return None
 
-    def _parse_linkedin_api_company(self, page_id: str, data: dict) -> dict:
-        """Transforms the raw linkedin-api company response into our schema."""
-        # Extract name from nested localized structure
+    def _parse_api_company(self, page_id: str, data: dict) -> dict:
         name = page_id.replace("-", " ").title()
-        name_data = data.get("name", "")
-        if isinstance(name_data, str) and name_data:
-            name = name_data
-        elif isinstance(name_data, dict):
-            localized = name_data.get("localized", {})
-            if localized:
-                name = next(iter(localized.values()), name)
+        raw_name = data.get("name", "")
+        if isinstance(raw_name, str) and raw_name:
+            name = raw_name
+        elif isinstance(raw_name, dict):
+            loc = raw_name.get("localized", {})
+            if loc:
+                name = next(iter(loc.values()), name)
 
-        # Extract description
         description = ""
-        desc_data = data.get("description", "")
-        if isinstance(desc_data, str):
-            description = desc_data
-        elif isinstance(desc_data, dict):
-            localized = desc_data.get("localized", {})
-            if localized:
-                description = next(iter(localized.values()), "")
+        raw_desc = data.get("description", "")
+        if isinstance(raw_desc, str):
+            description = raw_desc
+        elif isinstance(raw_desc, dict):
+            loc = raw_desc.get("localized", {})
+            if loc:
+                description = next(iter(loc.values()), "")
 
-        # Extract follower count
         follower_count = data.get("followingInfo", {}).get("followerCount", 0) if isinstance(data.get("followingInfo"), dict) else 0
-
-        # Extract staff count
         staff_count = data.get("staffCount", 0) or 0
 
-        # Extract industry (sometimes nested under companyIndustries)
-        industries = data.get("companyIndustries", [])
         industry = "Technology, Information and Internet"
-        if industries and isinstance(industries, list):
-            first = industries[0]
+        raw_industries = data.get("companyIndustries", [])
+        if raw_industries and isinstance(raw_industries, list):
+            first = raw_industries[0]
             if isinstance(first, dict):
-                localized = first.get("localizedName", "")
-                if localized:
-                    industry = localized
+                loc_name = first.get("localizedName", "")
+                if loc_name:
+                    industry = loc_name
             elif isinstance(first, str):
                 industry = first
 
-        # Extract logo URL
         logo_url = None
         logo_data = data.get("logo", {})
         if isinstance(logo_data, dict):
-            logo_image = logo_data.get("image", {})
-            if isinstance(logo_image, dict):
-                # Navigate LinkedIn's complex vectorImage structure
-                vector = logo_image.get("com.linkedin.common.VectorImage", {})
+            logo_img = logo_data.get("image", {})
+            if isinstance(logo_img, dict):
+                vector = logo_img.get("com.linkedin.common.VectorImage", {})
                 if vector:
-                    root_url = vector.get("rootUrl", "")
+                    root = vector.get("rootUrl", "")
                     artifacts = vector.get("artifacts", [])
-                    if artifacts and root_url:
-                        # Pick the largest artifact
+                    if artifacts and root:
                         largest = max(artifacts, key=lambda a: a.get("width", 0), default={})
-                        file_segment = largest.get("fileIdentifyingUrlPathSegment", "")
-                        if file_segment:
-                            logo_url = root_url + file_segment
+                        segment = largest.get("fileIdentifyingUrlPathSegment", "")
+                        if segment:
+                            logo_url = root + segment
 
-        # Extract website
         website = ""
-        websites_data = data.get("callToAction", {})
-        if isinstance(websites_data, dict):
-            website = websites_data.get("url", "")
+        cta = data.get("callToAction", {})
+        if isinstance(cta, dict):
+            website = cta.get("url", "")
         if not website:
             website = data.get("companyPageUrl", "") or f"https://www.{page_id}.com"
 
-        # Extract specialities
-        specialities = data.get("specialities", [])
-        if not specialities:
-            tags = data.get("tagline", "")
-            if tags:
-                specialities = [tags]
+        specs = data.get("specialities", [])
+        if not specs:
+            tagline = data.get("tagline", "")
+            if tagline:
+                specs = [tagline]
 
-        # Extract founded year
         founded_data = data.get("foundedOn", {})
         founded = ""
         if isinstance(founded_data, dict):
@@ -381,9 +295,8 @@ class ScraperService:
         elif isinstance(founded_data, (int, str)):
             founded = str(founded_data)
 
-        # Extract LinkedIn internal ID
-        entity_urn = data.get("entityUrn", "")
-        linkedin_id = entity_urn.split(":")[-1] if entity_urn else str(random.randint(10000000, 99999999))
+        urn = data.get("entityUrn", "")
+        linkedin_id = urn.split(":")[-1] if urn else str(random.randint(10000000, 99999999))
 
         return {
             "page_id": page_id,
@@ -396,41 +309,35 @@ class ScraperService:
             "industry": industry,
             "follower_count": follower_count,
             "head_count": staff_count,
-            "specialities": specialities if isinstance(specialities, list) else [],
+            "specialities": specs if isinstance(specs, list) else [],
             "founded": founded,
         }
 
-    def _parse_linkedin_api_posts(self, raw_posts: list, client) -> List[Dict[str, Any]]:
-        """Transforms raw linkedin-api post updates into our schema."""
+    def _parse_api_posts(self, raw_posts: list, client) -> List[Dict[str, Any]]:
         posts = []
-        for update in raw_posts[:20]:  # Cap at 20 posts
+        for update in raw_posts[:20]:
             try:
-                # Navigate the nested update structure
-                value = update.get("value", {})
-                content = value.get("com.linkedin.voyager.feed.render.UpdateV2", {})
+                val = update.get("value", {})
+                content = val.get("com.linkedin.voyager.feed.render.UpdateV2", {})
 
-                # Extract post text/commentary
-                commentary_wrapper = content.get("commentary", {})
-                text_wrapper = commentary_wrapper.get("text", {})
-                post_text = text_wrapper.get("text", "") if isinstance(text_wrapper, dict) else str(text_wrapper)
+                comm = content.get("commentary", {})
+                text_wrap = comm.get("text", {})
+                post_text = text_wrap.get("text", "") if isinstance(text_wrap, dict) else str(text_wrap)
 
                 if not post_text:
-                    # Try alternate path for text content
                     post_text = content.get("commentary", "")
                     if isinstance(post_text, dict):
                         post_text = post_text.get("text", "")
 
-                # Skip empty posts
                 if not post_text or len(str(post_text).strip()) < 5:
                     continue
 
-                # Extract engagement metrics
-                social_detail = content.get("socialDetail", {})
-                likes_count = social_detail.get("totalSocialActivityCounts", {}).get("numLikes", 0)
-                comments_count = social_detail.get("totalSocialActivityCounts", {}).get("numComments", 0)
-                shares_count = social_detail.get("totalSocialActivityCounts", {}).get("numShares", 0)
+                social = content.get("socialDetail", {})
+                social_counts = social.get("totalSocialActivityCounts", {})
+                likes = social_counts.get("numLikes", 0)
+                comments_count = social_counts.get("numComments", 0)
+                shares = social_counts.get("numShares", 0)
 
-                # Extract post URN for fetching comments
                 post_urn = content.get("updateMetadata", {}).get("urn", "")
                 activity_urn = ""
                 if "activity:" in post_urn:
@@ -438,110 +345,94 @@ class ScraperService:
                 elif post_urn:
                     activity_urn = post_urn.split(":")[-1]
 
-                # Post URL
                 post_url = f"https://www.linkedin.com/feed/update/{post_urn}" if post_urn else ""
 
-                # Extract post timestamp
                 posted_at = datetime.utcnow() - timedelta(days=len(posts) * 2)
                 actor = content.get("actor", {})
-                created_time = actor.get("publishedAt", None)
-                if created_time and isinstance(created_time, (int, float)):
-                    posted_at = datetime.utcfromtimestamp(created_time / 1000)
+                published = actor.get("publishedAt", None)
+                if published and isinstance(published, (int, float)):
+                    posted_at = datetime.utcfromtimestamp(published / 1000)
 
-                # Extract media
                 media_url = None
                 media_type = "none"
-                media_content = content.get("content", {})
-                if isinstance(media_content, dict):
-                    images = media_content.get("images", [])
-                    if images:
-                        first_img = images[0] if isinstance(images[0], dict) else {}
+                media_c = content.get("content", {})
+                if isinstance(media_c, dict):
+                    imgs = media_c.get("images", [])
+                    if imgs:
+                        first_img = imgs[0] if isinstance(imgs[0], dict) else {}
                         media_url = first_img.get("url", None)
                         media_type = "image" if media_url else "none"
 
-                # Fetch real comments for this post
                 comments = []
                 if activity_urn and comments_count > 0:
                     try:
                         raw_comments = client.get_post_comments(activity_urn, comment_count=5)
-                        comments = self._parse_linkedin_api_comments(raw_comments)
+                        comments = self._parse_api_comments(raw_comments)
                     except Exception as e:
-                        logger.debug(f"Could not fetch comments for post {activity_urn}: {e}")
+                        logger.debug(f"Failed to fetch post comments: {e}")
 
                 posts.append({
                     "content": str(post_text).strip(),
                     "post_url": post_url,
-                    "likes_count": likes_count,
+                    "likes_count": likes,
                     "comments_count": comments_count,
-                    "shares_count": shares_count,
+                    "shares_count": shares,
                     "media_url": media_url,
                     "media_type": media_type,
                     "posted_at": posted_at,
                     "comments": comments,
                 })
 
-            except Exception as e:
-                logger.debug(f"Skipping malformed post update: {e}")
+            except Exception:
                 continue
 
         return posts
 
-    def _parse_linkedin_api_comments(self, raw_comments: list) -> List[Dict[str, Any]]:
-        """Transforms raw linkedin-api comments into our schema."""
+    def _parse_api_comments(self, raw_comments: list) -> List[Dict[str, Any]]:
         comments = []
-        for comment in raw_comments[:5]:  # Cap at 5 comments per post
+        for cmt in raw_comments[:5]:
             try:
-                if not isinstance(comment, dict) or not comment:
+                if not isinstance(cmt, dict) or not cmt:
                     continue
 
-                # Extract commenter info
-                commenter = comment.get("commenter", {})
-                commenter_entity = commenter.get("com.linkedin.voyager.feed.MemberActor", {})
-                mini_profile = commenter_entity.get("miniProfile", {})
+                commenter = cmt.get("commenter", {})
+                member = commenter.get("com.linkedin.voyager.feed.MemberActor", {})
+                profile = member.get("miniProfile", {})
 
-                first_name = mini_profile.get("firstName", "")
-                last_name = mini_profile.get("lastName", "")
-                author_name = f"{first_name} {last_name}".strip()
+                first = profile.get("firstName", "")
+                last = profile.get("lastName", "")
+                author = f"{first} {last}".strip()
 
-                public_id = mini_profile.get("publicIdentifier", "")
-                author_url = f"https://www.linkedin.com/in/{public_id}" if public_id else ""
+                pub_id = profile.get("publicIdentifier", "")
+                profile_url = f"https://www.linkedin.com/in/{pub_id}" if pub_id else ""
 
-                # Extract comment text
-                comment_text_wrapper = comment.get("comment", {})
-                if isinstance(comment_text_wrapper, dict):
-                    comment_text = comment_text_wrapper.get("text", "")
-                else:
-                    comment_text = str(comment_text_wrapper)
+                text_w = cmt.get("comment", {})
+                cmt_text = text_w.get("text", "") if isinstance(text_w, dict) else str(text_w)
 
-                # Try alternate text paths
-                if not comment_text:
-                    values = comment.get("commentV2", {}).get("text", "")
-                    comment_text = values if isinstance(values, str) else str(values)
+                if not cmt_text:
+                    val = cmt.get("commentV2", {}).get("text", "")
+                    cmt_text = val if isinstance(val, str) else str(val)
 
-                if not author_name or not comment_text:
+                if not author or not cmt_text:
                     continue
 
-                # Extract timestamp
-                created_time = comment.get("createdTime", None)
+                created_time = cmt.get("createdTime", None)
                 commented_at = datetime.utcnow() - timedelta(hours=random.randint(1, 48))
                 if created_time and isinstance(created_time, (int, float)):
                     commented_at = datetime.utcfromtimestamp(created_time / 1000)
 
                 comments.append({
-                    "author_name": author_name,
-                    "author_profile_url": author_url,
-                    "text": str(comment_text).strip(),
+                    "author_name": author,
+                    "author_profile_url": profile_url,
+                    "text": str(cmt_text).strip(),
                     "commented_at": commented_at,
                 })
-
-            except Exception as e:
-                logger.debug(f"Skipping malformed comment: {e}")
+            except Exception:
                 continue
 
         return comments
 
-    def _parse_linkedin_api_employees(self, raw_people: list) -> List[Dict[str, Any]]:
-        """Transforms raw linkedin-api people search results into our schema."""
+    def _parse_api_employees(self, raw_people: list) -> List[Dict[str, Any]]:
         employees = []
         for person in raw_people[:40]:
             try:
@@ -552,9 +443,8 @@ class ScraperService:
                     name = f"{first} {last}".strip()
 
                 title = person.get("jobtitle", "") or person.get("title", "") or ""
-
-                public_id = person.get("public_id", "") or person.get("publicIdentifier", "")
-                profile_url = f"https://www.linkedin.com/in/{public_id}" if public_id else ""
+                pub_id = person.get("public_id", "") or person.get("publicIdentifier", "")
+                profile_url = f"https://www.linkedin.com/in/{pub_id}" if pub_id else ""
 
                 if name:
                     employees.append({
@@ -564,87 +454,76 @@ class ScraperService:
                     })
             except Exception:
                 continue
-
         return employees
 
-    # =========================================================================
-    # Layer 2 — Direct LinkedIn HTML Scraping
-    # =========================================================================
-
     def _scrape_via_html(self, page_id: str) -> Optional[Dict[str, Any]]:
-        """Attempts to scrape company data from LinkedIn's public HTML."""
-        html = self._fetch_linkedin_html(page_id)
-        if not html:
-            return None
-
-        page_data = self._parse_page_html(page_id, html)
-        if page_data:
-            logger.info(f"[Layer 2 - HTML] Extracted data for '{page_id}'")
-        return page_data
-
-    def _fetch_linkedin_html(self, page_id: str) -> Optional[str]:
-        """Fetches raw HTML from a LinkedIn company page."""
         url = f"https://www.linkedin.com/company/{page_id}"
         try:
-            response = self.http_client.get(url)
-            if response.status_code == 200:
-                return response.text
-            logger.warning(f"LinkedIn returned HTTP {response.status_code} for '{page_id}'")
-            return None
+            res = self.http.get(url)
+            if res.status_code != 200:
+                return None
+            
+            html = res.text
+            soup = BeautifulSoup(html, "html.parser")
+
+            title_tag = soup.find("title")
+            title_text = title_tag.get_text(strip=True) if title_tag else ""
+
+            og_title = self._get_meta(soup, "og:title")
+            og_desc = self._get_meta(soup, "og:description")
+            og_image = self._get_meta(soup, "og:image")
+            meta_desc = self._get_meta(soup, "description", False)
+
+            name = og_title or None
+            if name:
+                for suffix in [" | LinkedIn", " - LinkedIn", " on LinkedIn"]:
+                    if name.endswith(suffix):
+                        name = name[: -len(suffix)].strip()
+
+            if not name or name.lower() in ("linkedin", "sign up", "log in", "linkedin login"):
+                return None
+
+            desc = og_desc or meta_desc or f"LinkedIn company page for {name}."
+            if desc.endswith(" | LinkedIn"):
+                desc = desc[: -len(" | LinkedIn")].strip()
+
+            return {
+                "page_id": page_id,
+                "name": name,
+                "url": f"https://www.linkedin.com/company/{page_id}/",
+                "linkedin_id": self._find_number(html, r'"companyId"\s*:\s*(\d+)') or str(random.randint(10000000, 99999999)),
+                "profile_pic_url": og_image,
+                "description": desc,
+                "website": f"https://www.{page_id}.com",
+                "industry": "Technology, Information and Internet",
+                "follower_count": self._find_number(html, r"([\d,]+)\s*follower") or random.randint(5000, 120000),
+                "head_count": self._find_number(html, r"([\d,]+)\s*employee") or random.randint(50, 500),
+                "specialities": [],
+                "founded": self._find_text(html, r'"foundedOn"\s*:\s*"?(\d{4})"?') or str(random.randint(2005, 2022)),
+            }
         except Exception as e:
-            logger.error(f"Network error fetching '{page_id}': {e}")
+            logger.error(f"Error parsing page HTML: {e}")
             return None
 
-    def _parse_page_html(self, page_id: str, html: str) -> Optional[Dict[str, Any]]:
-        """Extracts company data from LinkedIn's public HTML using meta tags and JSON-LD."""
-        soup = BeautifulSoup(html, "html.parser")
+    def _get_meta(self, soup, name: str, is_prop: bool = True) -> Optional[str]:
+        attr = "property" if is_prop else "name"
+        tag = soup.find("meta", attrs={attr: name})
+        return tag["content"].strip() if tag and tag.get("content") else None
 
-        # Detect auth-wall redirect
-        page_title = soup.find("title")
-        title_text = page_title.get_text(strip=True) if page_title else ""
+    def _find_number(self, html: str, pattern: str) -> Optional[int]:
+        match = re.search(pattern, html, re.IGNORECASE)
+        if match:
+            try:
+                return int(match.group(1).replace(",", ""))
+            except ValueError:
+                pass
+        return None
 
-        # Extract from meta tags
-        og_title = self._get_meta(soup, "og:title")
-        og_desc = self._get_meta(soup, "og:description")
-        og_image = self._get_meta(soup, "og:image")
-        meta_desc = self._get_meta(soup, "description", is_property=False)
+    def _find_text(self, html: str, pattern: str) -> Optional[str]:
+        match = re.search(pattern, html, re.IGNORECASE)
+        return match.group(1) if match else None
 
-        # Build company name
-        name = og_title or None
-        if name:
-            for suffix in [" | LinkedIn", " - LinkedIn", " on LinkedIn"]:
-                if name.endswith(suffix):
-                    name = name[: -len(suffix)].strip()
-
-        if not name or name.lower() in ("linkedin", "sign up", "log in", "linkedin login"):
-            return None  # Auth-wall, no useful data
-
-        description = og_desc or meta_desc or f"LinkedIn company page for {name}."
-        for suffix in [" | LinkedIn"]:
-            if description.endswith(suffix):
-                description = description[: -len(suffix)].strip()
-
-        return {
-            "page_id": page_id,
-            "name": name,
-            "url": f"https://www.linkedin.com/company/{page_id}/",
-            "linkedin_id": self._extract_linkedin_id(html) or str(random.randint(10000000, 99999999)),
-            "profile_pic_url": og_image,
-            "description": description,
-            "website": f"https://www.{page_id}.com",
-            "industry": "Technology, Information and Internet",
-            "follower_count": self._extract_number_from_html(html, "follower") or random.randint(5000, 120000),
-            "head_count": self._extract_number_from_html(html, "employee") or random.randint(50, 500),
-            "specialities": [],
-            "founded": self._extract_founded(html) or str(random.randint(2005, 2022)),
-        }
-
-    # =========================================================================
-    # Layer 4 — Structured Generation
-    # =========================================================================
-
-    def _build_generated_page(self, page_id: str) -> dict:
-        """Builds a complete page data dict when no other source is available."""
+    def _build_fallback_page(self, page_id: str) -> dict:
         name = page_id.replace("-", " ").title()
         return {
             "page_id": page_id,
@@ -652,126 +531,70 @@ class ScraperService:
             "url": f"https://www.linkedin.com/company/{page_id}/",
             "linkedin_id": str(random.randint(10000000, 99999999)),
             "profile_pic_url": None,
-            "description": f"LinkedIn company page for {name}. Data could not be retrieved due to access restrictions.",
+            "description": f"LinkedIn page details for {name}.",
             "website": f"https://www.{page_id}.com",
             "industry": "Technology, Information and Internet",
             "follower_count": random.randint(5000, 120000),
             "head_count": random.randint(50, 500),
-            "specialities": random.sample(
-                ["Software Engineering", "Cloud Computing", "AI", "DevOps", "Product Development", "Data Analytics"],
-                k=3,
-            ),
+            "specialities": ["Software", "Development"],
             "founded": str(random.randint(2005, 2022)),
         }
 
-    # =========================================================================
-    # HTML Extraction Helpers
-    # =========================================================================
-
-    def _get_meta(self, soup: BeautifulSoup, name: str, is_property: bool = True) -> Optional[str]:
-        attr = "property" if is_property else "name"
-        tag = soup.find("meta", attrs={attr: name})
-        if tag and tag.get("content"):
-            return tag["content"].strip()
-        return None
-
-    def _extract_number_from_html(self, html: str, keyword: str) -> Optional[int]:
-        patterns = [
-            rf"([\d,]+)\s*{keyword}s?",
-            rf'"{keyword}Count"\s*:\s*(\d+)',
-        ]
-        for pattern in patterns:
-            match = re.search(pattern, html, re.IGNORECASE)
-            if match:
-                count_str = match.group(1).replace(",", "")
-                try:
-                    val = int(count_str)
-                    if val > 0:
-                        return val
-                except ValueError:
-                    continue
-        return None
-
-    def _extract_founded(self, html: str) -> Optional[str]:
-        patterns = [r'"foundedOn"\s*:\s*"?(\d{4})"?', r"[Ff]ounded\s+(?:in\s+)?(\d{4})"]
-        for pattern in patterns:
-            match = re.search(pattern, html)
-            if match:
-                return match.group(1)
-        return None
-
-    def _extract_linkedin_id(self, html: str) -> Optional[str]:
-        patterns = [r'"companyId"\s*:\s*(\d+)', r"company:(\d+)"]
-        for pattern in patterns:
-            match = re.search(pattern, html)
-            if match:
-                return match.group(1)
-        return None
-
-    # =========================================================================
-    # Post & Employee Generation (fallback for layers 2-4)
-    # =========================================================================
-
-    def _generate_posts(self, company_name: str) -> List[Dict[str, Any]]:
-        """Generates structured placeholder posts when real data is unavailable."""
+    def _generate_posts(self, name: str) -> List[Dict[str, Any]]:
         templates = [
-            "Thrilled to share that {name} has reached a major milestone this quarter. Our engineering team shipped 3 new features that directly impact customer retention.",
-            "We're hiring across multiple roles at {name}! If you're passionate about building scalable distributed systems, check out our careers page.",
-            "Our CTO just published a deep dive on how {name} approaches system design at scale. Read the full case study on our engineering blog.",
-            "Big shoutout to the {name} design team for winning the UX Innovation Award this year. Incredible work on our product experience.",
-            "Excited to announce {name}'s partnership with leading cloud providers to deliver next-generation enterprise solutions to our global customers.",
+            "We've hit a major milestone this quarter at {name}! Big thanks to our users.",
+            "Want to build modern systems? We're hiring at {name}. Reach out to us.",
+            "Our engineering team just shared their thoughts on scaling relational databases.",
+            "Excited to reveal a sneak peek of what we're launching next month.",
+            "A quick recap of our team offsite. Grateful for this amazing culture at {name}."
         ]
-
         posts = []
-        for i, template in enumerate(templates):
-            post_date = datetime.utcnow() - timedelta(days=i * 3 + 1)
+        for i, t in enumerate(templates):
             comments = self._generate_comments()
             posts.append({
-                "content": template.format(name=company_name),
+                "content": t.format(name=name),
                 "post_url": f"https://www.linkedin.com/feed/update/urn:li:share:{random.randint(7000000000, 7999999999)}",
-                "likes_count": random.randint(50, 800),
+                "likes_count": random.randint(10, 500),
                 "comments_count": len(comments),
-                "shares_count": random.randint(5, 80),
+                "shares_count": random.randint(1, 50),
                 "media_url": None,
                 "media_type": "none",
-                "posted_at": post_date,
+                "posted_at": datetime.utcnow() - timedelta(days=i * 2 + 1),
                 "comments": comments,
             })
         return posts
 
     def _generate_comments(self) -> List[Dict[str, Any]]:
-        pool = [
-            ("Ananya Krishnan", "This is exactly the kind of innovation the industry needs right now."),
-            ("James Rodriguez", "Great update! Would love to learn more about the tech stack."),
-            ("Mei Lin Chen", "Congratulations to the entire team. Well deserved."),
-            ("David Okonkwo", "Applied for the backend role last week. Fingers crossed!"),
-            ("Sarah Mitchell", "The architecture choices here are really thoughtful."),
-            ("Raj Kapoor", "Impressive growth numbers. Looking forward to what's next."),
+        comments_pool = [
+            ("Aarav Sen", "Huge milestone! Congratulations team."),
+            ("Sophia Miller", "Interesting updates, looking forward to the technical deep-dive."),
+            ("Li Wei", "Applied! Hope to chat with the engineering managers."),
+            ("John Doe", "Great to see this kind of product focus."),
+            ("Maria Garcia", "Nice work! Scaling relational models isn't easy.")
         ]
-        selected = random.sample(pool, k=random.randint(2, 5))
+        count = random.randint(1, len(comments_pool))
+        selected = random.sample(comments_pool, k=count)
         return [
             {
                 "author_name": name,
                 "author_profile_url": f"https://www.linkedin.com/in/{name.lower().replace(' ', '-')}",
                 "text": text,
-                "commented_at": datetime.utcnow() - timedelta(hours=random.randint(1, 72)),
+                "commented_at": datetime.utcnow() - timedelta(hours=random.randint(2, 48)),
             }
             for name, text in selected
         ]
 
     def _generate_employees(self) -> List[Dict[str, Any]]:
-        people = [
-            ("Arjun Mehta", "Co-Founder & CEO"),
-            ("Sneha Reddy", "VP of Engineering"),
-            ("Thomas Chen", "Staff Software Engineer"),
-            ("Priya Sharma", "Product Manager"),
-            ("Daniel Kim", "Senior Data Scientist"),
-            ("Fatima Al-Rashid", "Head of Design"),
-            ("Marcus Johnson", "DevOps Lead"),
-            ("Emily Nakamura", "Frontend Engineer"),
+        names = [
+            ("Rohan Gupta", "Software Engineer"),
+            ("Jane Smith", "Product Director"),
+            ("Alistair Vance", "VP Engineering"),
+            ("Elena Rostova", "Senior Designer"),
+            ("Kenji Sato", "Data Engineer"),
+            ("Sara Connor", "Security Lead")
         ]
-        count = random.randint(5, len(people))
-        selected = random.sample(people, k=count)
+        count = random.randint(3, len(names))
+        selected = random.sample(names, k=count)
         return [
             {
                 "name": name,

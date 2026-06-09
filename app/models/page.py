@@ -5,11 +5,8 @@ from app.models.base import Base, IDMixin, TimestampMixin
 
 
 class Page(Base, IDMixin, TimestampMixin):
-    """SQLAlchemy model representing a LinkedIn Company Page."""
-    
     __tablename__ = "pages"
 
-    # page_id is the unique slug from the URL (e.g. "deepsolv")
     page_id: Mapped[str] = mapped_column(
         String(255), 
         unique=True, 
@@ -38,11 +35,9 @@ class Page(Base, IDMixin, TimestampMixin):
         nullable=False
     )
     
-    # Store lists as MySQL native JSON
     specialities: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
     founded: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 
-    # Relationships
     posts: Mapped[List["Post"]] = relationship(
         "Post",
         back_populates="page",

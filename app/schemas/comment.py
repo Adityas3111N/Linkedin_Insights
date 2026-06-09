@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class CommentBase(BaseModel):
-    author_name: Optional[str] = Field(None, description="Display name of the comment author")
-    author_profile_url: Optional[str] = Field(None, description="LinkedIn profile URL of the author")
-    text: str = Field(..., description="The content text of the comment")
-    commented_at: Optional[datetime] = Field(None, description="When the comment was published on LinkedIn")
+    author_name: Optional[str] = None
+    author_profile_url: Optional[str] = None
+    text: str
+    commented_at: Optional[datetime] = None
 
 
 class CommentCreate(CommentBase):
@@ -15,7 +15,7 @@ class CommentCreate(CommentBase):
 
 
 class CommentResponse(CommentBase):
-    id: int = Field(..., description="Internal database ID")
-    created_at: datetime = Field(..., description="When this comment was stored in our database")
+    id: int
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

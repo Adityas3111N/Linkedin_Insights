@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class EmployeeBase(BaseModel):
-    name: str = Field(..., description="Display name of the employee")
-    title: Optional[str] = Field(None, description="Job title at the company")
-    profile_url: Optional[str] = Field(None, description="LinkedIn profile URL of the employee")
+    name: str
+    title: Optional[str] = None
+    profile_url: Optional[str] = None
 
 
 class EmployeeCreate(EmployeeBase):
@@ -14,7 +14,7 @@ class EmployeeCreate(EmployeeBase):
 
 
 class EmployeeResponse(EmployeeBase):
-    id: int = Field(..., description="Internal database ID")
-    created_at: datetime = Field(..., description="When this record was stored in our database")
+    id: int
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
