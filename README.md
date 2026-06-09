@@ -84,14 +84,18 @@ pip install -r requirements.txt
 ```
 
 ### 3. Environment Setup
-Create a `.env` file in the root directory:
+Copy the sample environment file to `.env` and fill in your database/LinkedIn configurations:
+```bash
+cp .env.example .env
+```
+Or create a `.env` file in the root directory:
 ```env
 DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/linkedin_insights
 APP_ENV=development
 APP_DEBUG=True
 API_V1_STR=/api/v1
-LINKEDIN_EMAIL=your_email@gmail.com
-LINKEDIN_PASSWORD=your_password
+LINKEDIN_EMAIL=
+LINKEDIN_PASSWORD=
 ```
 
 *Note: Create the database `linkedin_insights` inside your MySQL server before running the app. Tables are created automatically on startup.*
